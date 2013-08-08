@@ -66,7 +66,6 @@ Visualization of Fractal Structures inspired by Bashar Communications
 http://bashar.org
 */
 
-
 import ddf.minim.*;
 import ddf.minim.signals.*;
 import ddf.minim.effects.*;
@@ -87,9 +86,6 @@ int fft_band_per_oct = 1;
 int numZones = 0;
 
 Frequency freq;
-float[] freqArr;
-float[] freqArrLast;
-float[] maxArr;
 
 float avgAvgNorm = 0;
 float sumAvgNorm = 0;
@@ -123,6 +119,7 @@ int _b = 50;
 int _alph = 100;
 int val, val2, val3;
 int _recursion = 0;
+int play_mode = -1;
 
 
 FractalRoot shape1;
@@ -130,12 +127,12 @@ FractalRoot shape2;
 FractalRoot shape3;
 
 // Remove to disable automatic fullscreen
-boolean sketchFullScreen() {
-  return true;
-}
+//boolean sketchFullScreen() {
+//  return true;
+//}
 
 void setup() {
-  size(displayWidth, displayHeight, OPENGL);
+  size(800, 600, OPENGL);
   smooth();
   frameRate(60);
 
@@ -154,8 +151,14 @@ void setup() {
   //==============================================
   
 
-  freq = new Frequency();
+  freq = new Frequency(minim, in, track, fft, sampleRate,
+    bufferSize, fft_base_freq, fft_band_per_oct, numZones );
   freq.initialize();
+  
+  /* Starting with track playing in analysis mode because this seems to fix an initial faulty analysis of line-in data */
+  mode = 1;
+  play_mode = 0;
+  playMode( play_mode );
   
 }
 
@@ -166,20 +169,26 @@ void mouseDragged() {
 
 void keyPressed() {
     if (key == 'm' || key == 'M') {
-      
       if (mode < 2) { mode += 1; }
       else {mode = 0;}
     }
     if (key == 'p' || key == 'P') {
-      playMode(0);
+      if( play_mode != 0 ) {
+        play_mode = 0;
+        playMode( play_mode );
+      } else {
+        play_mode = -1;
+        playMode( play_mode );
+      }
     }
     if (key == 'l' || key == 'L') {
+      println("Line-in");
       playMode(1);
     }
     
     if (key == 'g' || key == 'G') { 
     for (int i = 0; i < numZones; i++) {
-      maxArr[i] = 0;
+      freq.maxArr[i] = 0;
       }
     }
     
@@ -201,14 +210,14 @@ void keyPressed() {
 
 void playMode(int i) {
   if(i == 0) {
+    //in.removeListener(freq);
     track.loop();
-    //in.removeListener(input_sketcher);
-    //groove.addListener(input_sketcher);
     play_track = true;
-  } 
-  if (i == 1) {
-    //groove.removeListener(input_sketcher);
-    //in.addListener(input_sketcher);
+  } else if (i == 1) {
+    track.pause();
+    in.addListener(freq);
+    play_track = false;
+  } else if (i < 0) {
     track.pause();
     play_track = false;
   }
@@ -223,7 +232,7 @@ void draw() {
   _xNoise += 0.01;
   _yNoise += 0.001;
   
-  freqArr = freq.analyze(1);
+  float[] drawFreqArr = freq.analyze(1, play_track);
     
     
     // MUTED MODE
@@ -258,13 +267,13 @@ void draw() {
    sumAvgNormLast = sumAvgNorm;
    float avgNorm = 0;
    
-   for (int i = 0; i < freqArr.length; i++) {
-    avgNorm += freqArr[i];
+   for (int i = 0; i < drawFreqArr.length; i++) {
+    avgNorm += drawFreqArr[i];
    }
-   avgNorm /= freqArr.length;
+   avgNorm /= drawFreqArr.length;
    sumAvgNorm += avgNorm;
    avgAvgNorm = sumAvgNorm /frameCount;
-   println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm);
+   //println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm);
    
    
    // APPLY FREQUENCY ANALYSIS LOGIC HERE
@@ -295,7 +304,7 @@ void draw() {
    // 0 ***** 0 Hz - 86 Hz ***** //
   // colour? 
    int i = 0;
-   _b = round(freqArr[i] * 255);
+   _b = round(drawFreqArr[i] * 255);
    if (_b < 50) {_b = 50;}
    
    // 1 ***** 86 Hz - 172 Hz ***** //
@@ -303,8 +312,8 @@ void draw() {
    i = 1;
    
    //_recursion = round(map(freqArr[i], 0, 1, 1, 3));
-   if (freqArr[i] <= 0.1) {_recursion = 1;}
-   if (freqArr[i] <= 0.6) {_recursion = 2;}
+   if (drawFreqArr[i] <= 0.1) {_recursion = 1;}
+   if (drawFreqArr[i] <= 0.6) {_recursion = 2;}
    else {_recursion = 3;}
    
    
@@ -312,7 +321,7 @@ void draw() {
    // SNARE THUMP 200-300hz
    i = 2;
    
-   if (freqArr[i] >= 0.66) {
+   if (drawFreqArr[i] >= 0.66) {
      if (_numSides >= _numMax) {_numSides = _numMin;}
      else {_numSides += 1;}
    }
@@ -322,13 +331,13 @@ void draw() {
    
    // 4 ***** 689 Hz - 1378 Hz ***** //
    i = 4;
-   _g = round(freqArr[i] * 255) - 50;
+   _g = round(drawFreqArr[i] * 255) - 50;
    if (_g < 30) {_g = 0;}
    
    // 5 ***** 1378 Hz - 2756 Hz ***** // XXX snare? 
    // SNARE THWACK 1.5K - 2.5K, ++++
    i = 5;
-   _strutFactor = map(freqArr[i], 0, 1, _strutMin, _strutMax);
+   _strutFactor = map(drawFreqArr[i], 0, 1, _strutMin, _strutMax);
    
    // 6 ***** 2756 Hz - 5512 Hz ***** //
    
@@ -336,14 +345,14 @@ void draw() {
    // SNARE SIZZLE 7K-10k
    i = 7;
    
-   if (freqArr[i] <= 0.1) {_maxlevels = 1;}
-   if (freqArr[i] <= 0.5) {_maxlevels = 2;}
+   if (drawFreqArr[i] <= 0.1) {_maxlevels = 1;}
+   if (drawFreqArr[i] <= 0.5) {_maxlevels = 2;}
    else {_maxlevels = 3;}
    //_maxlevels = round(map(freqArr[i], 0, 1, _minlevels, 3));
    
    // 8 ***** 11025 Hz - 22050 Hz ***** // XXX highest pitch +++++
    i = 8;
-   _r = round(freqArr[i] * 255) - 25;
+   _r = round(drawFreqArr[i] * 255) - 25;
    if (_r < 25) {_r = 0;}
   }
   
@@ -557,142 +566,4 @@ void stop() {
 }
 
 //====================================================================
-class Frequency 
-{
-  /*
-  Minim minim;
-  AudioInput in;
-  AudioPlayer track;
-  
-  FFT fft;
-    
-  int sampleRate = 44100;
-  int bufferSize = 512;
-   
-  int fft_base_freq = 86; 
-  int fft_band_per_oct = 1;
-  int numZones = 0;
-  */
-  //Frequency()  {}
-  
-  
-  void initialize() {
-   /*
-    minim = new Minim(this);
-    track = minim.loadFile("track.mp3", bufferSize);
-    track.loop();
-    */
-    fft = new FFT(bufferSize, sampleRate);    
-    fft.logAverages(fft_base_freq, fft_band_per_oct);
-   
-    fft.window(FFT.HAMMING);
-   
-    numZones = fft.avgSize(); 
-    
-    float[] freqArr = new float[numZones];
-    freqArrLast = new float[numZones];
-    maxArr = new float[numZones]; // WAS "float[]" THE ISSUE??!
-    
-    println("numZones: "+numZones);
-    println("freqArr: "+freqArr.length+" maxArr: "+maxArr.length);
-    
-    for (int i = 0; i < numZones; i++) {
-     freqArr[i] = 0;
-     freqArrLast[i] = 0;
-     maxArr[i] = 0;
-     println("freqArr: "+freqArr[i]+"maxArr: "+maxArr[i]);
-    }
-    
-    
-    println("Initialized...");
-  }
-  
-  void store(float[] fArr) {
-    freqArrLast = new float[fArr.length];
-    arrayCopy(fArr, freqArrLast);
-    //for (int i = 0; i < fArr.length; i++) {
-    //freqArrLast[i] = fArr[i];
-    //}
-  }
-  
-  float[] analyze(int n) {
-    
-    println("=========="+frameCount+"==========");
-    
-    float[] freqArr = new float[numZones];
-   //println("Start: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
-    
-    if (play_track = true) { 
-    fft.forward(track.mix); // change to "fft.forward(in.mix)" for live input [works at least with integrated microphones]
-    }
-    if (play_track = false) {
-      println("mixing input");
-      fft.forward(in.mix);
-    }
-    
-    int highZone = numZones - 1;
-    
-   
-    for (int i = 0; i < numZones; i++) {
-   
-      float average = fft.getAvg(i); 
-   
-      float avg = 0;
-      int lowFreq;
-   
-      if ( i == 0 ) {
-        lowFreq = 0;
-      }
-      else {
-        lowFreq = (int)((sampleRate/2) / (float)Math.pow(2, numZones - i)); // 0, 86, 172, 344, 689, 1378, 2756, 5512, 11025
-      }
-      int hiFreq = (int)((sampleRate/2) / (float)Math.pow(2, highZone - i)); // 86, 172, 344, 689, 1378, 2756, 5512, 11025, 22050
-  
-   
-      int lowBound = fft.freqToIndex(lowFreq);
-      int hiBound = fft.freqToIndex(hiFreq);
-   
-      for (int j = lowBound; j <= hiBound; j++) { // j is 0 - 256
-   
-        float spectrum = fft.getBand(j); 
-   
-        avg += spectrum; 
-      }
-   
-      avg /= (hiBound - lowBound + 1);
-      average = avg;
-      
-      
-      freqArr[i] = avg;
-      
-        if (n == 0) {
-        println("f: ("+i+") "+avg); 
-        }
-      
-      
-      if (n == 1) {  
-       
-       if (avg > maxArr[i]) {
-         maxArr[i] = avg;
-       }
-         float norm = map(avg, 0, maxArr[i], 0, 1);
-         freqArr[i] = norm;
-       
-       //println("End: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
-       println("f: ("+i+") Value: "+avg+" Norm: "+freqArr[i]+" Max: "+maxArr[i]);
-       
-       
-       /*
-       if (avg != freqArrLast[i]) {
-         freqArrLast[i] = avg;
-       }
-       */
-       
-       }
-       
-    }
-  
-  //store(freqArr);
-  return freqArr;
-  }
-}
+
