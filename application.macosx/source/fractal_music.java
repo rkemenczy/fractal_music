@@ -92,7 +92,6 @@ http://bashar.org
 
 
 
-
 Minim minim;
 AudioInput in;
 AudioPlayer track;
@@ -108,9 +107,6 @@ int fft_band_per_oct = 1;
 int numZones = 0;
 
 Frequency freq;
-float[] freqArr;
-float[] freqArrLast;
-float[] maxArr;
 
 float avgAvgNorm = 0;
 float sumAvgNorm = 0;
@@ -144,6 +140,7 @@ int _b = 50;
 int _alph = 100;
 int val, val2, val3;
 int _recursion = 0;
+int play_mode = -1;
 
 
 FractalRoot shape1;
@@ -151,12 +148,12 @@ FractalRoot shape2;
 FractalRoot shape3;
 
 // Remove to disable automatic fullscreen
-public boolean sketchFullScreen() {
-  return true;
-}
+//boolean sketchFullScreen() {
+//  return true;
+//}
 
 public void setup() {
-  size(displayWidth, displayHeight, OPENGL);
+  size(800, 600, OPENGL);
   smooth();
   frameRate(60);
 
@@ -175,8 +172,14 @@ public void setup() {
   //==============================================
   
 
-  freq = new Frequency();
+  freq = new Frequency(minim, in, track, fft, sampleRate,
+    bufferSize, fft_base_freq, fft_band_per_oct, numZones );
   freq.initialize();
+  
+  /* Starting with track playing in analysis mode because this seems to fix an initial faulty analysis of line-in data */
+  mode = 1;
+  play_mode = 0;
+  playMode( play_mode );
   
 }
 
@@ -187,20 +190,26 @@ public void mouseDragged() {
 
 public void keyPressed() {
     if (key == 'm' || key == 'M') {
-      
       if (mode < 2) { mode += 1; }
       else {mode = 0;}
     }
     if (key == 'p' || key == 'P') {
-      playMode(0);
+      if( play_mode != 0 ) {
+        play_mode = 0;
+        playMode( play_mode );
+      } else {
+        play_mode = -1;
+        playMode( play_mode );
+      }
     }
     if (key == 'l' || key == 'L') {
+      println("Line-in");
       playMode(1);
     }
     
     if (key == 'g' || key == 'G') { 
     for (int i = 0; i < numZones; i++) {
-      maxArr[i] = 0;
+      freq.maxArr[i] = 0;
       }
     }
     
@@ -222,14 +231,14 @@ public void keyPressed() {
 
 public void playMode(int i) {
   if(i == 0) {
+    //in.removeListener(freq);
     track.loop();
-    //in.removeListener(input_sketcher);
-    //groove.addListener(input_sketcher);
     play_track = true;
-  } 
-  if (i == 1) {
-    //groove.removeListener(input_sketcher);
-    //in.addListener(input_sketcher);
+  } else if (i == 1) {
+    track.pause();
+    in.addListener(freq);
+    play_track = false;
+  } else if (i < 0) {
     track.pause();
     play_track = false;
   }
@@ -244,7 +253,7 @@ public void draw() {
   _xNoise += 0.01f;
   _yNoise += 0.001f;
   
-  freqArr = freq.analyze(1);
+  float[] drawFreqArr = freq.analyze(1, play_track);
     
     
     // MUTED MODE
@@ -279,13 +288,13 @@ public void draw() {
    sumAvgNormLast = sumAvgNorm;
    float avgNorm = 0;
    
-   for (int i = 0; i < freqArr.length; i++) {
-    avgNorm += freqArr[i];
+   for (int i = 0; i < drawFreqArr.length; i++) {
+    avgNorm += drawFreqArr[i];
    }
-   avgNorm /= freqArr.length;
+   avgNorm /= drawFreqArr.length;
    sumAvgNorm += avgNorm;
    avgAvgNorm = sumAvgNorm /frameCount;
-   println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm);
+   //println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm);
    
    
    // APPLY FREQUENCY ANALYSIS LOGIC HERE
@@ -316,7 +325,7 @@ public void draw() {
    // 0 ***** 0 Hz - 86 Hz ***** //
   // colour? 
    int i = 0;
-   _b = round(freqArr[i] * 255);
+   _b = round(drawFreqArr[i] * 255);
    if (_b < 50) {_b = 50;}
    
    // 1 ***** 86 Hz - 172 Hz ***** //
@@ -324,8 +333,8 @@ public void draw() {
    i = 1;
    
    //_recursion = round(map(freqArr[i], 0, 1, 1, 3));
-   if (freqArr[i] <= 0.1f) {_recursion = 1;}
-   if (freqArr[i] <= 0.6f) {_recursion = 2;}
+   if (drawFreqArr[i] <= 0.1f) {_recursion = 1;}
+   if (drawFreqArr[i] <= 0.6f) {_recursion = 2;}
    else {_recursion = 3;}
    
    
@@ -333,7 +342,7 @@ public void draw() {
    // SNARE THUMP 200-300hz
    i = 2;
    
-   if (freqArr[i] >= 0.66f) {
+   if (drawFreqArr[i] >= 0.66f) {
      if (_numSides >= _numMax) {_numSides = _numMin;}
      else {_numSides += 1;}
    }
@@ -343,13 +352,13 @@ public void draw() {
    
    // 4 ***** 689 Hz - 1378 Hz ***** //
    i = 4;
-   _g = round(freqArr[i] * 255) - 50;
+   _g = round(drawFreqArr[i] * 255) - 50;
    if (_g < 30) {_g = 0;}
    
    // 5 ***** 1378 Hz - 2756 Hz ***** // XXX snare? 
    // SNARE THWACK 1.5K - 2.5K, ++++
    i = 5;
-   _strutFactor = map(freqArr[i], 0, 1, _strutMin, _strutMax);
+   _strutFactor = map(drawFreqArr[i], 0, 1, _strutMin, _strutMax);
    
    // 6 ***** 2756 Hz - 5512 Hz ***** //
    
@@ -357,14 +366,14 @@ public void draw() {
    // SNARE SIZZLE 7K-10k
    i = 7;
    
-   if (freqArr[i] <= 0.1f) {_maxlevels = 1;}
-   if (freqArr[i] <= 0.5f) {_maxlevels = 2;}
+   if (drawFreqArr[i] <= 0.1f) {_maxlevels = 1;}
+   if (drawFreqArr[i] <= 0.5f) {_maxlevels = 2;}
    else {_maxlevels = 3;}
    //_maxlevels = round(map(freqArr[i], 0, 1, _minlevels, 3));
    
    // 8 ***** 11025 Hz - 22050 Hz ***** // XXX highest pitch +++++
    i = 8;
-   _r = round(freqArr[i] * 255) - 25;
+   _r = round(drawFreqArr[i] * 255) - 25;
    if (_r < 25) {_r = 0;}
   }
   
@@ -578,9 +587,12 @@ public void stop() {
 }
 
 //====================================================================
-class Frequency 
+
+class Frequency implements AudioListener 
 {
-  /*
+  private float[] left;
+  private float[] right;
+  
   Minim minim;
   AudioInput in;
   AudioPlayer track;
@@ -593,9 +605,52 @@ class Frequency
   int fft_base_freq = 86; 
   int fft_band_per_oct = 1;
   int numZones = 0;
-  */
-  //Frequency()  {}
   
+  float[] freqArr;
+  float[] freqArrLast;
+  float[] maxArr;
+ 
+  Frequency( Minim minim, AudioInput in, AudioPlayer track, FFT fft, 
+    int sampleRate, int bufferSize, int fft_base_freq, int fft_band_per_oct, int numZones ){
+  
+    left = new float[bufferSize];
+    right = new float[bufferSize];
+    for (int i=0, end=bufferSize; i < end; i++) {
+      left[i]= 0.0f; 
+      right[i] = 0.0f;
+    }
+    
+      /* Import global variables during construction or use local defaults */
+      if( minim != null ) 
+        this.minim = minim;
+      if( in != null ) 
+        this.in = in;
+      if( track != null ) 
+        this.track = track;
+      if( fft != null ) 
+        this.fft = fft;
+      if( sampleRate > -1 ) 
+        this.sampleRate = sampleRate;
+      if( bufferSize > -1 ) 
+        this.bufferSize = bufferSize;
+      if( fft_base_freq > -1 ) 
+        this.fft_base_freq = fft_base_freq;
+      if( fft_band_per_oct > -1 ) 
+        this.fft_band_per_oct = fft_band_per_oct;
+      if( numZones > -1 ) 
+        this.numZones = numZones;
+  }
+  
+  public synchronized void samples(float[] samp)
+  {
+    left = samp;
+  }
+  
+  public synchronized void samples(float[] sampL, float[] sampR)
+  {
+    left = sampL;
+    right = sampR;
+  }
   
   public void initialize() {
    /*
@@ -610,22 +665,22 @@ class Frequency
    
     numZones = fft.avgSize(); 
     
-    float[] freqArr = new float[numZones];
+    freqArr = new float[numZones];
     freqArrLast = new float[numZones];
     maxArr = new float[numZones]; // WAS "float[]" THE ISSUE??!
     
-    println("numZones: "+numZones);
-    println("freqArr: "+freqArr.length+" maxArr: "+maxArr.length);
+    //println("numZones: "+numZones);
+    //println("freqArr: "+freqArr.length+" maxArr: "+maxArr.length);
     
     for (int i = 0; i < numZones; i++) {
      freqArr[i] = 0;
      freqArrLast[i] = 0;
      maxArr[i] = 0;
-     println("freqArr: "+freqArr[i]+"maxArr: "+maxArr[i]);
+     //println("freqArr: "+freqArr[i]+"maxArr: "+maxArr[i]);
     }
     
     
-    println("Initialized...");
+    //println("Initialized...");
   }
   
   public void store(float[] fArr) {
@@ -636,19 +691,23 @@ class Frequency
     //}
   }
   
-  public float[] analyze(int n) {
+  public float[] analyze( int n, boolean play_track ) {
     
-    println("=========="+frameCount+"==========");
+    //println("=========="+frameCount+"==========");
+    println( "Play track: "+ play_track );
     
     float[] freqArr = new float[numZones];
    //println("Start: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
     
-    if (play_track = true) { 
-    fft.forward(track.mix); // change to "fft.forward(in.mix)" for live input [works at least with integrated microphones]
-    }
-    if (play_track = false) {
+    if (play_track == true) { 
+      fft.forward(track.mix); 
+      /* Change to "fft.forward(in.mix)" for live input [works at least with integrated microphones],
+       * but doesn't work for mono/stereo line-in
+       */
+    } else {
       println("mixing input");
-      fft.forward(in.mix);
+      /* AudioInput requires an AudioListener (this) to retrieve its mix buffer */
+      fft.forward(left);
     }
     
     int highZone = numZones - 1;
@@ -700,7 +759,7 @@ class Frequency
          freqArr[i] = norm;
        
        //println("End: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
-       println("f: ("+i+") Value: "+avg+" Norm: "+freqArr[i]+" Max: "+maxArr[i]);
+       //println("f: ("+i+") Value: "+avg+" Norm: "+freqArr[i]+" Max: "+maxArr[i]);
        
        
        /*
