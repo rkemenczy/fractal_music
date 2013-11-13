@@ -25,7 +25,7 @@
 
     <!-- http://developer.apple.com/documentation/MacOSX/Conceptual/BPRuntimeConfig/Articles/PListKeys.html#//apple_ref/doc/uid/20001431-113616 -->
     <key>LSUIPresentationMode</key>
-    <integer>0</integer>
+    <integer>4</integer>
 
     <key>LSArchitecturePriority</key>
     <array>
@@ -36,7 +36,7 @@
     <key>Java</key>
     <dict>
       <key>VMOptions</key>
-      <string> -Xms64m -Xmx256m</string>
+      <string></string>
 
       <key>MainClass</key>
       <string>fractal_music</string>

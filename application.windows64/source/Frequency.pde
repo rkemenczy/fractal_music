@@ -63,11 +63,6 @@ class Frequency implements AudioListener
   }
   
   void initialize() {
-   /*
-    minim = new Minim(this);
-    track = minim.loadFile("track.mp3", bufferSize);
-    track.loop();
-    */
     fft = new FFT(bufferSize, sampleRate);    
     fft.logAverages(fft_base_freq, fft_band_per_oct);
    
@@ -77,37 +72,26 @@ class Frequency implements AudioListener
     
     freqArr = new float[numZones];
     freqArrLast = new float[numZones];
-    maxArr = new float[numZones]; // WAS "float[]" THE ISSUE??!
-    
-    //println("numZones: "+numZones);
-    //println("freqArr: "+freqArr.length+" maxArr: "+maxArr.length);
+    maxArr = new float[numZones]; 
     
     for (int i = 0; i < numZones; i++) {
      freqArr[i] = 0;
      freqArrLast[i] = 0;
      maxArr[i] = 0;
-     //println("freqArr: "+freqArr[i]+"maxArr: "+maxArr[i]);
     }
     
-    
-    //println("Initialized...");
   }
   
   void store(float[] fArr) {
     freqArrLast = new float[fArr.length];
     arrayCopy(fArr, freqArrLast);
-    //for (int i = 0; i < fArr.length; i++) {
-    //freqArrLast[i] = fArr[i];
-    //}
   }
   
   float[] analyze( int n, boolean play_track ) {
     
-    //println("=========="+frameCount+"==========");
     println( "Play track: "+ play_track );
     
     float[] freqArr = new float[numZones];
-   //println("Start: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
     
     if (play_track == true) { 
       fft.forward(track.mix); 
@@ -167,22 +151,9 @@ class Frequency implements AudioListener
        }
          float norm = map(avg, 0, maxArr[i], 0, 1);
          freqArr[i] = norm;
-       
-       //println("End: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
-       //println("f: ("+i+") Value: "+avg+" Norm: "+freqArr[i]+" Max: "+maxArr[i]);
-       
-       
-       /*
-       if (avg != freqArrLast[i]) {
-         freqArrLast[i] = avg;
-       }
-       */
-       
        }
        
     }
-  
-  //store(freqArr);
   return freqArr;
   }
 }

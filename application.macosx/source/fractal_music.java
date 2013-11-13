@@ -21,21 +21,9 @@ public class fractal_music extends PApplet {
 
 /* "RESPONSIVE MUSIC VISUALIZATION USING 2D FRACTAL STRUCTURES"
 
-August 4th 2013
-!!!!! ALPHA CODE !!!!! PLEASE READ !!!!! USAGE BELOW !!!!!
-
-This code isn't meant for general release, but it works!
-I intend to significantly improve, streamline and extend
-it in the coming weeks. Replace "track.mix" below to
-enable live music input! Allow the visualization to
-run for a few minutes to adapt the amplitude range
-to your selected track/type of music.
-
-If you manage to upload a high-quality screencast and send
-me the link before I manage to do so, I'd be very happy.
+GITHUB: https://github.com/rkemenczy/fractal_music
 
 Feel free to contact me for any feedback and inquiries.
-
 
 Enjoy!
 
@@ -43,48 +31,6 @@ Raffael K\u00e9m\u00e9nczy
 
 contact@kemenczy.at
 www.kemenczy.at
-
-
-+++++USAGE+++++
-
-Press "m" to cycle between 1) demo 2) music analysis and 3) manual user input mode.
-Press "p" to loop the file named "track.mp3" located in the "data" subdirectory.
-You may insert a supported MP3 file you own for this - pick you favourite track!
-You may also use the supplied track which is free to use!
-
-For music analysis mode:
-
-Press "g" to reset learned amplitudes for all frequencies.
-
-For manual mode:
-
-Press "k" to clear the screen.
-Press "i" to invert colours.
-Press/hold "o" to dilate the drawing. [very slow in current implementation]
-Press/hold "w" to increase size.
-Press/hold "e" to decrease size.
-Press/hold "r" to increase the number of sides / change the fractal shape.
-Press/hold "t" to decrease the number of sides / change the fractal shape.
-
-Left-click drag the mouse in order to change the strut factor along the X (width) axis.
-
-
-*****Sources/Inspirations*****
-
-Processing Reference and Tutorials
-http://processing.org/
-
-Fractal Code (Sutcliffe Pentagon) adapted from/inspired by the book Generative Art: A Practical Guide by Matt Pearson
-http://abandonedart.org/
-
-Music Analysis Code adapted from/inspired by @JoelleSnaith
-http://www.openprocessing.org/sketch/101123
-
-Switch Mechanics adapted from/inspired by Revlin John (Phono Divinoro)
-http://stylogicalmaps.blogspot.hu/
-
-Visualization of Fractal Structures inspired by Bashar Communications
-http://bashar.org
 */
 
 
@@ -95,13 +41,12 @@ http://bashar.org
 Minim minim;
 AudioInput in;
 AudioPlayer track;
-//Waveline input_sketcher;
+
+// Setup for music analysis
 
 FFT fft;
-  
 int sampleRate = 44100;
 int bufferSize = 512;
- 
 int fft_base_freq = 86; 
 int fft_band_per_oct = 1;
 int numZones = 0;
@@ -116,30 +61,30 @@ boolean play_track;
 
 //=============================
 
-float _strutFactor = 1;
+float _strutFactor = 1; // Initialisation of strut factor
 float _strutNoise;
-float _strutMin = -1;
-float _strutMax = 2;
-int _maxlevels = 3; //values 1-3 (performance)
-int _minlevels = 1;
-int _numSides = 3;
-int _numMin = 3; // lower value breaks the code
-int _numMax = 6; //reduced to 6 (performance)
-int[] _numForbidden = {7, 11, 19, 21, 23, 25}; // make array with prohibited _numSide numbers because they don't create a symmetric(?) fractal
+float _strutMin = -1; // Minimum strut value
+float _strutMax = 2; // Maximum strut value
+int _maxlevels = 3; // 
+int _minlevels = 1; // 
+int _numSides = 3; // Initialisation value of sides of the fractal
+int _numMin = 3; // Minimum number of sides of the fractal, need 3 to make a triangle, lower value breaks the code
+int _numMax = 6; // Maximum number of sides of the fractal (capped at 6 performance)
+int[] _numForbidden = {7, 11, 19, 21, 23, 25}; // make array with prohibited _numSide numbers because they don't create a symmetric(?) fractal and look ugly
 int _degCount = 360;
 int mode = 0;
 int cx = width/2;
 int cy = height/2;
 int lastcx, lastcy;
-float _xNoise, _yNoise;
-float _rad = 150;
-float _radMin = 100;
-float _radMax = 500;
-int _r, _g;
+float _xNoise, _yNoise; // Noise values for random mode
+float _rad = 150; // Initialisation value of radius
+float _radMin = 100; // Minimum radius allowed - adjust to screen size
+float _radMax = 500; // Maximum radius allowed - adjust to screen size
+int _r, _g; //
 int _b = 50;
 int _alph = 100;
 int val, val2, val3;
-int _recursion = 0;
+int _recursion = 0; // Initialisation value of drawn fractal recursion
 int play_mode = -1;
 
 
@@ -147,15 +92,15 @@ FractalRoot shape1;
 FractalRoot shape2;
 FractalRoot shape3;
 
-// Remove to disable automatic fullscreen
+// +++ UNCOMMENT TO ENABLE AUTOMATIC FULLSCREEN +++
 //boolean sketchFullScreen() {
 //  return true;
 //}
 
 public void setup() {
-  size(800, 600, OPENGL);
+  size(displayWidth, displayHeight, OPENGL); // Adjust to screen resolution as needed
   smooth();
-  frameRate(60);
+  frameRate(60); // 60 FPS for high quality
 
   _strutNoise = random(10);
   _xNoise = random(10);
@@ -164,10 +109,7 @@ public void setup() {
   
   //==============================================
   minim = new Minim(this);
-  track = minim.loadFile("track.mp3", bufferSize);
-  //track.loop();
-  
-  
+  track = minim.loadFile("track.mp3", bufferSize); // need a "track.mp3" file in "/data" folder
   in = minim.getLineIn(Minim.STEREO, bufferSize);
   //==============================================
   
@@ -189,10 +131,12 @@ public void mouseDragged() {
 }
 
 public void keyPressed() {
+  // Press "m" to toggle between random, manual mouse input and music analysis modes.
     if (key == 'm' || key == 'M') {
       if (mode < 2) { mode += 1; }
       else {mode = 0;}
     }
+    // Press "p" to toggle music play mode
     if (key == 'p' || key == 'P') {
       if( play_mode != 0 ) {
         play_mode = 0;
@@ -202,26 +146,30 @@ public void keyPressed() {
         playMode( play_mode );
       }
     }
+    // Press "l" to toggle line-in mode
     if (key == 'l' || key == 'L') {
       println("Line-in");
       playMode(1);
     }
-    
+    // Press "g" to re-set maximum absolute frequency values detected (used to enable percentage-based processing)
     if (key == 'g' || key == 'G') { 
     for (int i = 0; i < numZones; i++) {
       freq.maxArr[i] = 0;
       }
     }
-    
+    // Press "k" to fill black
      if (key == 'k' || key == 'K') {
             fill(255, 255);
       rect(0, 0, width, height);
     }
+    // Press "i" to invert colours
     if (key == 'i' || key == 'I') {
       filter(INVERT);
   }
+  // Press "o" to dilate (uses processing power)
   if (key == 'o' || key == 'O') { filter(DILATE); }
       
+      // Change radius and number of sides in manual input mode
       if (key == 'w' || key == 'W') { _rad += 10;}
       if (key == 'e' || key == 'E') { _rad -= 10;}
       
@@ -245,8 +193,7 @@ public void playMode(int i) {
 }
 
 public void draw() {
-  //background(255);
-  fill(0, 20);
+  fill(0, 18); // Change value for different fade effect intensity [Idea: Influence via music or implement real blur?]
   rect(0,0,width,height);
   
   _strutNoise += 0.01f;
@@ -256,19 +203,16 @@ public void draw() {
   float[] drawFreqArr = freq.analyze(1, play_track);
     
     
-    // MUTED MODE
-    
+  // +++ Random Mode calculations (mode == 0) +++
   if (mode == 0) { 
   _strutFactor = (noise(_strutNoise) * _strutMax) + _strutMin; // play with this
   _rad = (noise(_xNoise) * _radMax) + _radMin; //map(mouseX, 0, width, _radMin, _radMax)
-  
   _numSides = _numMin + round(noise(_yNoise) * (_numMax - _numMin));
   
     for (int i = 0; i < _numForbidden.length; i++) {
   if (_numSides == _numForbidden[i]) {_numSides -= 1; println("numSides - 1:"+_numSides); break;}
   }
-  
-  
+    
   _r = round(255*(noise(_yNoise)));
   _g = round(255*(noise(_xNoise)));
   _b = round(255*(noise(_strutNoise)));
@@ -280,11 +224,10 @@ public void draw() {
   _recursion = 3;
   }
   
-    // MUSIC ANALYSIS MODE
+  // +++ Music Analysis calculations (mode == 1) +++
   
   if (mode == 1) { 
-    
-    // FREQUENCY AVERAGE PRINTOUT
+   // Determine overall volume through frequency average
    sumAvgNormLast = sumAvgNorm;
    float avgNorm = 0;
    
@@ -294,45 +237,30 @@ public void draw() {
    avgNorm /= drawFreqArr.length;
    sumAvgNorm += avgNorm;
    avgAvgNorm = sumAvgNorm /frameCount;
-   //println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm);
+   //println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm); // Frequency Average Printout
    
+   // +++ APPLY FURTHER FREQUENCY ANALYSIS LOGIC HERE +++
    
-   // APPLY FREQUENCY ANALYSIS LOGIC HERE
+   _alph = 100; // Alpha value of drawn fractals, manually adjust to screen/projector brightness
    
-   // OVERALL AMPLITUDE
-   
-   /*
-   float vTotal = avgNormLast - avgNorm;
-   
-   if (vTotal >= 0) { boolean positive = true; }
-   if (vTotal < 0) { boolean positive = false; }
-   
-   float vTotalPos = abs(vTotal); 
-   float vBuffer = vTotalPos //log(vTotal*1000)*10
-   
-   if (positive = true) {vBuffer *= -1}
-   if (positive = false) {vBuffer *= -1}
-   */
-   
-   _alph = 100;
+   // Overall Volume (avgNorm)
+   // Radius _rad is determined by overall volume, within allowed range
    
    _rad = round(map(avgNorm, 0, 1, _radMin, _radMax)); 
-   //_radMax * avgNorm;
-  //if (_rad < _radMin) {_rad = _radMin;}
-  
-   //_rad = (avgNorm * _radMax) + _radMin;
-   
+ 
    // 0 ***** 0 Hz - 86 Hz ***** //
-  // colour? 
+   // BASS
    int i = 0;
-   _b = round(drawFreqArr[i] * 255);
-   if (_b < 50) {_b = 50;}
+   
+   // Blue _b is tied to this spectrum
+   _b = round(drawFreqArr[i] * 255); 
+   if (_b < 50) {_b = 50;} // Minimum blue value so fractal is always visible
    
    // 1 ***** 86 Hz - 172 Hz ***** //
    // KICK DRUM BOTTOM 80-100 Hz
    i = 1;
    
-   //_recursion = round(map(freqArr[i], 0, 1, 1, 3));
+   // _recursion is tied to this spectrum
    if (drawFreqArr[i] <= 0.1f) {_recursion = 1;}
    if (drawFreqArr[i] <= 0.6f) {_recursion = 2;}
    else {_recursion = 3;}
@@ -342,6 +270,7 @@ public void draw() {
    // SNARE THUMP 200-300hz
    i = 2;
    
+   // _numSides is tied to this spectrum
    if (drawFreqArr[i] >= 0.66f) {
      if (_numSides >= _numMax) {_numSides = _numMin;}
      else {_numSides += 1;}
@@ -349,35 +278,48 @@ public void draw() {
    
    
    // 3 ***** 344 Hz - 689 Hz ***** //
+   i = 3;
+   
+   // no variable tied to this spectrum yet - invent your own!
+   
    
    // 4 ***** 689 Hz - 1378 Hz ***** //
    i = 4;
-   _g = round(drawFreqArr[i] * 255) - 50;
-   if (_g < 30) {_g = 0;}
    
-   // 5 ***** 1378 Hz - 2756 Hz ***** // XXX snare? 
-   // SNARE THWACK 1.5K - 2.5K, ++++
+   // Green _g is tied to this spectrum
+   _g = round(drawFreqArr[i] * 255) - 50;
+   if (_g < 30) {_g = 0;} // Green is only made visible if at least 30/255 (11,7%)
+   
+   // 5 ***** 1378 Hz - 2756 Hz ***** 
+   // SNARE THWACK 1.5K - 2.5K
    i = 5;
+   
+   // Fractal's _strutFactor is tied to this spectrum within allowed range 
    _strutFactor = map(drawFreqArr[i], 0, 1, _strutMin, _strutMax);
    
    // 6 ***** 2756 Hz - 5512 Hz ***** //
+   i = 6;
+   
+   // no variable tied to this spectrum yet - invent your own!
+
    
    // 7 ***** 5512 Hz - 11025 Hz ***** //
    // SNARE SIZZLE 7K-10k
    i = 7;
    
+   // _maxlevels is tied to this spectrum
    if (drawFreqArr[i] <= 0.1f) {_maxlevels = 1;}
    if (drawFreqArr[i] <= 0.5f) {_maxlevels = 2;}
    else {_maxlevels = 3;}
-   //_maxlevels = round(map(freqArr[i], 0, 1, _minlevels, 3));
    
-   // 8 ***** 11025 Hz - 22050 Hz ***** // XXX highest pitch +++++
+   
+   // 8 ***** 11025 Hz - 22050 Hz ***** // 
    i = 8;
    _r = round(drawFreqArr[i] * 255) - 25;
    if (_r < 25) {_r = 0;}
   }
   
-  // GENERAL DRAWINGS AND VALUES
+  // +++ DRAWING INITIALISATION +++
   
   cx = width/2;
   cy = height/2;
@@ -386,18 +328,23 @@ public void draw() {
   if (_numSides == _numForbidden[i]) {_numSides -= 1; println("numSides - 1:"+_numSides); break;}
   }
   
-
+  
+  // First fractal initialisation based on values from above
   shape1 = new FractalRoot(90+frameCount, _degCount, _rad, cx, cy, _r, _g, _b, _alph, _recursion); //use frameCount to spin
   shape1.drawShape();
   
+  // Changing random values for random mode
   _strutNoise += 0.02f;
   _xNoise += 0.02f;
   _yNoise += 0.002f;
 
+  // Second fractal, inverted 180 degrees, _rad adjusted by _numSides, lower alpha, fixed _recursion
   shape3 = new FractalRoot(270+frameCount, _degCount+180, _rad/_numSides, cx, cy, _r, _g, _b, _alph-50, 2);
   shape3.drawShape();
   
 }
+
+  // +++ FRACTAL DRAWING +++
 
   class PointObj {
     float x, y;
@@ -411,14 +358,11 @@ public void draw() {
     PointObj[] pointArr = {};
     Branch rootBranch;
     
-
     FractalRoot(float startAngle, float degCount, float radius, float centX, float centY, float r, float g, float b, float alph, int rec) {
       float angleStep = 360.0f/_numSides;
       
-      int recLocal = rec;
-      recLocal -= 1;
-      
-      
+      int recLocal = rec; // Local recursion value
+      recLocal -= 1; // Decrease to prevent infinite recursion!
       
       for (float i = 0; i< _degCount; i += angleStep) {
         float x = centX + (radius * cos(radians(startAngle + i)));
@@ -427,14 +371,10 @@ public void draw() {
         
         if (recLocal > 0) {
           shape2 = new FractalRoot(270-frameCount, _degCount+180, _rad/_numSides, x, y, r, g, b, alph, recLocal);
-          //if (recLocal < _recursion) {r -= 10; alph -= 10;}
           stroke(r, g, b, alph);
           shape2.drawShape();
         }
-        
       }
-      
-      
 
       rootBranch = new Branch(0, 0, pointArr);
     }
@@ -484,7 +424,6 @@ public void draw() {
     public void drawMe() {
       strokeWeight(5 - level);
       
-      
       for (int i = 0; i < outerPoints.length; i++) {
         int nexti = i+1;
         if (nexti == outerPoints.length) { 
@@ -492,8 +431,6 @@ public void draw() {
         }
         line(outerPoints[i].x, outerPoints[i].y, outerPoints[nexti].x, outerPoints[nexti].y);
       }
-
-  
 
       for (int k = 0; k < myBranches.length; k++) {
         myBranches[k].drawMe();
@@ -653,11 +590,6 @@ class Frequency implements AudioListener
   }
   
   public void initialize() {
-   /*
-    minim = new Minim(this);
-    track = minim.loadFile("track.mp3", bufferSize);
-    track.loop();
-    */
     fft = new FFT(bufferSize, sampleRate);    
     fft.logAverages(fft_base_freq, fft_band_per_oct);
    
@@ -667,37 +599,26 @@ class Frequency implements AudioListener
     
     freqArr = new float[numZones];
     freqArrLast = new float[numZones];
-    maxArr = new float[numZones]; // WAS "float[]" THE ISSUE??!
-    
-    //println("numZones: "+numZones);
-    //println("freqArr: "+freqArr.length+" maxArr: "+maxArr.length);
+    maxArr = new float[numZones]; 
     
     for (int i = 0; i < numZones; i++) {
      freqArr[i] = 0;
      freqArrLast[i] = 0;
      maxArr[i] = 0;
-     //println("freqArr: "+freqArr[i]+"maxArr: "+maxArr[i]);
     }
     
-    
-    //println("Initialized...");
   }
   
   public void store(float[] fArr) {
     freqArrLast = new float[fArr.length];
     arrayCopy(fArr, freqArrLast);
-    //for (int i = 0; i < fArr.length; i++) {
-    //freqArrLast[i] = fArr[i];
-    //}
   }
   
   public float[] analyze( int n, boolean play_track ) {
     
-    //println("=========="+frameCount+"==========");
     println( "Play track: "+ play_track );
     
     float[] freqArr = new float[numZones];
-   //println("Start: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
     
     if (play_track == true) { 
       fft.forward(track.mix); 
@@ -757,27 +678,14 @@ class Frequency implements AudioListener
        }
          float norm = map(avg, 0, maxArr[i], 0, 1);
          freqArr[i] = norm;
-       
-       //println("End: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
-       //println("f: ("+i+") Value: "+avg+" Norm: "+freqArr[i]+" Max: "+maxArr[i]);
-       
-       
-       /*
-       if (avg != freqArrLast[i]) {
-         freqArrLast[i] = avg;
-       }
-       */
-       
        }
        
     }
-  
-  //store(freqArr);
   return freqArr;
   }
 }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "fractal_music" };
+    String[] appletArgs = new String[] { "--full-screen", "--bgcolor=#666666", "--hide-stop", "fractal_music" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {
