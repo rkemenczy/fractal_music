@@ -1,6 +1,5 @@
 
 void mouseDragged() {
-
   _strutFactor = map(mouseX, 0, width, _strutMin, _strutMax);
 }
 
@@ -12,6 +11,7 @@ void keyPressed() {
     else {
       mode = 0;
     }
+    println("mode is: "+mode);
   }
   if (key == 'p' || key == 'P') {
     if ( play_mode != 0 ) {
@@ -25,18 +25,20 @@ void keyPressed() {
       track.pause();
       play_track = false;
     }
+    print("play_mode is: "+play_mode);
   }
   if (key == 'l' || key == 'L') {
-    println("Line-in");
     track.pause();
     in.addListener(freq);
     play_track = false;
+    println("Line-in");
   }
 
   if (key == 'g' || key == 'G') { 
     for (int i = 0; i < numZones; i++) {
       freq.maxArr[i] = 0;
     }
+    println("cleared freq array");
   }
 
   if (key == 'k' || key == 'K') {
@@ -56,7 +58,6 @@ void keyPressed() {
   if (key == 'e' || key == 'E') { 
     _rad -= 10;
   }
-
   if (key == 'r' || key == 'R') { 
     if (_numSides <= _numMax) { 
       _numSides += 1; 

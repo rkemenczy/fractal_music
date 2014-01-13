@@ -7,7 +7,7 @@ void mutedMode() {
     for (int i = 0; i < _numForbidden.length; i++) {
       if (_numSides == _numForbidden[i]) {
         _numSides -= 1; 
-        println("numSides - 1:"+_numSides); 
+        //println("numSides - 1:"+_numSides); 
         break;
       }
     }

@@ -104,7 +104,7 @@ class Frequency implements AudioListener
   float[] analyze( int n, boolean play_track ) {
     
     //println("=========="+frameCount+"==========");
-    println( "Play track: "+ play_track );
+    //println( "Play track: "+ play_track );
     
     float[] freqArr = new float[numZones];
    //println("Start: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
@@ -115,7 +115,7 @@ class Frequency implements AudioListener
        * but doesn't work for mono/stereo line-in
        */
     } else {
-      println("mixing input");
+      //println("mixing input");
       /* AudioInput requires an AudioListener (this) to retrieve its mix buffer */
       fft.forward(left);
     }
@@ -156,7 +156,7 @@ class Frequency implements AudioListener
       freqArr[i] = avg;
       
         if (n == 0) {
-        println("f: ("+i+") "+avg); 
+        //println("f: ("+i+") "+avg); 
         }
       
       
