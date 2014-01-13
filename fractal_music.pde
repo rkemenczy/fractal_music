@@ -97,10 +97,10 @@ void setup() {
   mode = 1;
   play_mode = 0;
   //in.removeListener(freq);
-    track.loop();
-    play_track = true;
-    fill(0);
-    rect(0,0,width,height);
+  track.loop();
+  play_track = true;
+  fill(0);
+  rect(0, 0, width, height);
 }
 
 
