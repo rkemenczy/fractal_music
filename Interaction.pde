@@ -1,10 +1,27 @@
+/* 
+ in a nutshell:
+ * dragging the mouse changes the strutFactor
+ * m changes mode
+ * l sets input to line-in
+ * g clears the FreqArray
+ * k clears screen with white background
+ * i applies inversion filter
+ * o applies dilation
+ * w increase rad
+ * e decrease rad 
+ * r increase number of sides
+ * t decrease number of sides
+ */
+
 
 void mouseDragged() {
   _strutFactor = map(mouseX, 0, width, _strutMin, _strutMax);
 }
 
 void keyPressed() {
-  if (key == 'm' || key == 'M') {
+  switch(key) {
+  case 'm':
+  case 'M':
     if (mode < 2) { 
       mode += 1;
     }
@@ -12,63 +29,56 @@ void keyPressed() {
       mode = 0;
     }
     println("mode is: "+mode);
-  }
-  if (key == 'p' || key == 'P') {
-    if ( play_mode != 0 ) {
-      play_mode = 0;
-      //in.removeListener(freq);
-      track.loop();
-      play_track = true;
-    } 
-    else {
-      play_mode = -1;
-      track.pause();
-      play_track = false;
-    }
-    print("play_mode is: "+play_mode);
-  }
-  if (key == 'l' || key == 'L') {
+    break;
+  case 'l':
+  case 'L':
     track.pause();
     in.addListener(freq);
     play_track = false;
     println("Line-in");
-  }
-
-  if (key == 'g' || key == 'G') { 
+    break;
+  case 'g':
+  case 'G': 
     for (int i = 0; i < numZones; i++) {
       freq.maxArr[i] = 0;
     }
     println("cleared freq array");
-  }
-
-  if (key == 'k' || key == 'K') {
-    fill(255, 255);
+    break;
+  case 'k':
+  case 'K':
+    fill(255);
     rect(0, 0, width, height);
-  }
-  if (key == 'i' || key == 'I') {
+    break;
+  case 'i':
+  case 'I':
     filter(INVERT);
-  }
-  if (key == 'o' || key == 'O') { 
+    break;
+  case 'o':
+  case 'O': 
     filter(DILATE);
-  }
-
-  if (key == 'w' || key == 'W') { 
+    break;
+  case 'w':
+  case 'W':
     _rad += 10;
-  }
-  if (key == 'e' || key == 'E') { 
+    break;
+  case 'e':
+  case 'E': 
     _rad -= 10;
-  }
-  if (key == 'r' || key == 'R') { 
+    break;
+  case 'r':
+  case 'R': 
     if (_numSides <= _numMax) { 
       _numSides += 1; 
       println("Sides: "+_numSides);
     }
-  }
-  if (key == 't' || key == 'T') { 
+    break;
+  case 't':
+  case 'T': 
     if (_numSides > _numMin) { 
       _numSides -= 1; 
       println("Sides: "+_numSides);
     }
+    break;
   }
 }
 

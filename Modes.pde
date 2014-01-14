@@ -11,8 +11,6 @@ void mutedMode() {
       break;
     }
   }
-
-
   _r = round(255*(noise(_yNoise)));
   _g = round(255*(noise(_xNoise)));
   _b = round(255*(noise(_strutNoise)));
@@ -25,7 +23,6 @@ void mutedMode() {
 }
 
 void musicAnalysisMode(float[] drawFreqArr) {
-
   // FREQUENCY AVERAGE PRINTOUT
   sumAvgNormLast = sumAvgNorm;
   float avgNorm = 0;
@@ -36,8 +33,6 @@ void musicAnalysisMode(float[] drawFreqArr) {
   avgNorm /= drawFreqArr.length;
   sumAvgNorm += avgNorm;
   avgAvgNorm = sumAvgNorm /frameCount;
-  //println("Average Norm: "+avgNorm+" Overall Average Norm: "+avgAvgNorm);
-
 
   // APPLY FREQUENCY ANALYSIS LOGIC HERE
 
@@ -100,7 +95,6 @@ void musicAnalysisMode(float[] drawFreqArr) {
       _numSides += 1;
     }
   }
-
 
   // 3 ***** 344 Hz - 689 Hz ***** //
 

@@ -6,20 +6,16 @@ class PointObj {
   }
 }
 
-
 class FractalRoot {
   PointObj[] pointArr = {
   };
   Branch rootBranch;
-
 
   FractalRoot(float startAngle, float degCount, float radius, float centX, float centY, float r, float g, float b, float alph, int rec) {
     float angleStep = 360.0f/_numSides;
 
     int recLocal = rec;
     recLocal -= 1;
-
-
 
     for (float i = 0; i< _degCount; i += angleStep) {
       float x = centX + (radius * cos(radians(startAngle + i)));
@@ -34,13 +30,10 @@ class FractalRoot {
       }
     }
 
-
-
     rootBranch = new Branch(0, 0, pointArr);
   }
 
   void drawShape() {
-
     rootBranch.drawMe();
   }
 }
@@ -84,7 +77,6 @@ class Branch {
   void drawMe() {
     strokeWeight(5 - level);
 
-
     for (int i = 0; i < outerPoints.length; i++) {
       int nexti = i+1;
       if (nexti == outerPoints.length) { 
@@ -92,8 +84,6 @@ class Branch {
       }
       line(outerPoints[i].x, outerPoints[i].y, outerPoints[nexti].x, outerPoints[nexti].y);
     }
-
-
 
     for (int k = 0; k < myBranches.length; k++) {
       myBranches[k].drawMe();
@@ -179,3 +169,4 @@ class Branch {
     return new PointObj(px, py);
   }
 }
+

@@ -51,19 +51,17 @@ class Frequency implements AudioListener
       this.numZones = numZones;
   }
 
-  synchronized void samples(float[] samp)
-  {
+  synchronized void samples(float[] samp) {
     left = samp;
   }
 
-  synchronized void samples(float[] sampL, float[] sampR)
-  {
+  synchronized void samples(float[] sampL, float[] sampR) {
     left = sampL;
     right = sampR;
   }
 
   void initialize() {
-    /*
+    /* TODO why is this now in main?
     minim = new Minim(this);
      track = minim.loadFile("track.mp3", bufferSize);
      track.loop();
@@ -77,57 +75,41 @@ class Frequency implements AudioListener
 
     freqArr = new float[numZones];
     freqArrLast = new float[numZones];
-    maxArr = new float[numZones]; // WAS "float[]" THE ISSUE??!
-
-    //println("numZones: "+numZones);
-    //println("freqArr: "+freqArr.length+" maxArr: "+maxArr.length);
+    maxArr = new float[numZones]; // WAS "float[]" THE ISSUE??! TODO WHAT???
 
     for (int i = 0; i < numZones; i++) {
       freqArr[i] = 0;
       freqArrLast[i] = 0;
       maxArr[i] = 0;
-      //println("freqArr: "+freqArr[i]+"maxArr: "+maxArr[i]);
     }
-
-
-    //println("Initialized...");
   }
 
   void store(float[] fArr) {
     freqArrLast = new float[fArr.length];
     arrayCopy(fArr, freqArrLast);
-    //for (int i = 0; i < fArr.length; i++) {
+    //for (int i = 0; i < fArr.length; i++) { // TODO what was that used for?
     //freqArrLast[i] = fArr[i];
     //}
   }
 
   float[] analyze( int n, boolean play_track ) {
-
-    //println("=========="+frameCount+"==========");
-    //println( "Play track: "+ play_track );
-
     float[] freqArr = new float[numZones];
-    //println("Start: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
 
-    if (play_track == true) { 
+    if (play_track == true) { // TODO what about mode here? 
       fft.forward(track.mix); 
       /* Change to "fft.forward(in.mix)" for live input [works at least with integrated microphones],
-       * but doesn't work for mono/stereo line-in
+       * but doesn't work for mono/stereo line-in TODO what?
        */
     } 
     else {
-      //println("mixing input");
       /* AudioInput requires an AudioListener (this) to retrieve its mix buffer */
       fft.forward(left);
     }
 
     int highZone = numZones - 1;
 
-
     for (int i = 0; i < numZones; i++) {
-
       float average = fft.getAvg(i); 
-
       float avg = 0;
       int lowFreq;
 
@@ -137,43 +119,33 @@ class Frequency implements AudioListener
       else {
         lowFreq = (int)((sampleRate/2) / (float)Math.pow(2, numZones - i)); // 0, 86, 172, 344, 689, 1378, 2756, 5512, 11025
       }
-      int hiFreq = (int)((sampleRate/2) / (float)Math.pow(2, highZone - i)); // 86, 172, 344, 689, 1378, 2756, 5512, 11025, 22050
 
+      int hiFreq = (int)((sampleRate/2) / (float)Math.pow(2, highZone - i)); // 86, 172, 344, 689, 1378, 2756, 5512, 11025, 22050
 
       int lowBound = fft.freqToIndex(lowFreq);
       int hiBound = fft.freqToIndex(hiFreq);
 
       for (int j = lowBound; j <= hiBound; j++) { // j is 0 - 256
-
         float spectrum = fft.getBand(j); 
-
         avg += spectrum;
       }
 
       avg /= (hiBound - lowBound + 1);
       average = avg;
 
-
       freqArr[i] = avg;
 
       if (n == 0) {
-        //println("f: ("+i+") "+avg);
+        //println("f: ("+i+") "+avg); // TODO what?
       }
-
-
       if (n == 1) {  
-
         if (avg > maxArr[i]) {
           maxArr[i] = avg;
         }
         float norm = map(avg, 0, maxArr[i], 0, 1);
         freqArr[i] = norm;
 
-        //println("End: freqArr: "+freqArr.length+"maxArr: "+maxArr.length);
-        //println("f: ("+i+") Value: "+avg+" Norm: "+freqArr[i]+" Max: "+maxArr[i]);
-
-
-        /*
+        /* TODO was this a safeguard?
        if (avg != freqArrLast[i]) {
          freqArrLast[i] = avg;
          }
@@ -181,7 +153,7 @@ class Frequency implements AudioListener
       }
     }
 
-    //store(freqArr);
+    //store(freqArr); // TODO what?
     return freqArr;
   }
 }
