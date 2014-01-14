@@ -1,6 +1,7 @@
 /* 
  in a nutshell:
- * dragging the mouse changes the strutFactor
+ * dragging the mouse in X changes the strutFactor
+ * dragging the mouse in Y changes rad
  * m changes mode
  * l sets input to line-in
  * g clears the FreqArray
@@ -14,7 +15,10 @@
  */
 
 void mouseDragged() {
-  _strutFactor = map(mouseX, 0, width, _strutMin, _strutMax);
+  if (mode == 2) {
+    _strutFactor = map(mouseX, 0, width, _strutMin, _strutMax);
+    _rad = map(mouseY, 0, height, _radMin, _radMax);
+  }
 }
 
 void keyPressed() {
