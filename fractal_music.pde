@@ -120,13 +120,6 @@ void draw() {
   cx = width/2;
   cy = height/2;
 
-  for (int i = 0; i < _numForbidden.length; i++) { // TODO is this static code?
-    if (_numSides == _numForbidden[i]) { // TODO move to draw fractal?
-      _numSides -= 1; 
-      break;
-    }
-  }
-
   shape1 = new FractalRoot(90+frameCount, _degCount, _rad, cx, cy, _r, _g, _b, _alph, _recursion); //use frameCount to spin
   shape1.drawShape();
 

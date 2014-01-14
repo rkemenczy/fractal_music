@@ -69,16 +69,18 @@ void keyPressed() {
   case 'r':
   case 'R': 
     if (_numSides <= _numMax) { 
-      _numSides += 1; 
-      println("Sides: "+_numSides);
+      _numSides += 1;
+      checkSides();
     }
+    println("Sides: "+_numSides);
     break;
   case 't':
   case 'T': 
     if (_numSides > _numMin) { 
-      _numSides -= 1; 
-      println("Sides: "+_numSides);
+      _numSides -= 1;
+      checkSides();
     }
+    println("Sides: "+_numSides);
     break;
   }
 }

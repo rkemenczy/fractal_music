@@ -20,6 +20,7 @@ void demoMode() {
   _rad = (noise(_xNoise) * _radMax) + _radMin; //map(mouseX, 0, width, _radMin, _radMax)
 
   _numSides = _numMin + round(noise(_yNoise) * (_numMax - _numMin));
+  checkSides();
 
   for (int i = 0; i < _numForbidden.length; i++) {
     if (_numSides == _numForbidden[i]) {
@@ -111,6 +112,7 @@ void musicAnalysisMode() {
     else {
       _numSides += 1;
     }
+    checkSides();
   }
 
   // 3 ***** 344 Hz - 689 Hz ***** //

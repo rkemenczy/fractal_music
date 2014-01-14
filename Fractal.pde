@@ -170,3 +170,12 @@ class Branch {
   }
 }
 
+void checkSides() {
+  for (int i = 0; i < _numForbidden.length; i++) {
+    if (_numSides == _numForbidden[i]) {
+      _numSides -= 1; 
+      break;
+    }
+  }
+}
+
