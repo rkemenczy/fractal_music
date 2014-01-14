@@ -13,7 +13,6 @@
  * t decrease number of sides
  */
 
-
 void mouseDragged() {
   _strutFactor = map(mouseX, 0, width, _strutMin, _strutMax);
 }
@@ -28,7 +27,7 @@ void keyPressed() {
     else {
       mode = 0;
     }
-    println("mode is: "+mode);
+    printMode();
     break;
   case 'l':
   case 'L':
@@ -60,10 +59,12 @@ void keyPressed() {
   case 'w':
   case 'W':
     _rad += 10;
+    println("rad is: "+_rad);
     break;
   case 'e':
   case 'E': 
     _rad -= 10;
+    println("rad is: "+_rad);
     break;
   case 'r':
   case 'R': 

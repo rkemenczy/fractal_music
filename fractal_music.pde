@@ -63,7 +63,7 @@ int[] _numForbidden = {
 float _rad = 150;
 float _radMin = 100;
 float _radMax = 500;
-shape
+
 FractalRoot shape1;
 FractalRoot shape2;
 FractalRoot shape3;
@@ -110,16 +110,12 @@ void draw() {
   _xNoise += 0.01;
   _yNoise += 0.001;
 
-  float[] drawFreqArr = freq.analyze(1, play_track); // TODO what does the 1 do? why here?
-
-  // MUTED MODE
-  if (mode == 0) { // TODO rename to muted boolean? 
-    mutedMode();
+  // pick mode
+  if (mode == 0) { 
+    demoMode();
   }
-
-  // MUSIC ANALYSIS MODE
-  if (mode == 1) { 
-    musicAnalysisMode(drawFreqArr);
+  else if (mode == 1) { 
+    musicAnalysisMode();
   }
 
   // react to resize
@@ -127,7 +123,7 @@ void draw() {
   cy = height/2;
 
   for (int i = 0; i < _numForbidden.length; i++) { // TODO is this static code?
-    if (_numSides == _numForbidden[i]) {
+    if (_numSides == _numForbidden[i]) { // TODO move to draw fractal?
       _numSides -= 1; 
       break;
     }

@@ -1,4 +1,18 @@
-void mutedMode() {
+void printMode() {
+  if (mode == 0) {
+    println("Mode is 0 (demo mode)");
+  }
+  else if (mode == 1) {
+    println("Mode is 1 (music analysis mode)");
+  }
+  else if (mode == 2) {
+    println("Mode is 2 (mouse mode)");
+  }
+}
+
+void demoMode() {
+  _strutNoise
+  
   _strutFactor = (noise(_strutNoise) * _strutMax) + _strutMin; // play with this
   _rad = (noise(_xNoise) * _radMax) + _radMin; //map(mouseX, 0, width, _radMin, _radMax)
 
@@ -7,7 +21,6 @@ void mutedMode() {
   for (int i = 0; i < _numForbidden.length; i++) {
     if (_numSides == _numForbidden[i]) {
       _numSides -= 1; 
-      //println("numSides - 1:"+_numSides); 
       break;
     }
   }
@@ -22,7 +35,8 @@ void mutedMode() {
   _recursion = 3;
 }
 
-void musicAnalysisMode(float[] drawFreqArr) {
+void musicAnalysisMode() {
+    float[] drawFreqArr = freq.analyze(1, play_track); // TODO what does the 1 do? why here?
   // FREQUENCY AVERAGE PRINTOUT
   sumAvgNormLast = sumAvgNorm;
   float avgNorm = 0;
