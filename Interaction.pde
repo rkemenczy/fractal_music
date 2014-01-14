@@ -27,7 +27,7 @@ void keyPressed() {
     else {
       mode = 0;
     }
-    printMode();
+    printCurrentMode();
     break;
   case 'l':
   case 'L':

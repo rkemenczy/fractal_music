@@ -1,4 +1,4 @@
-void printMode() {
+void printCurrentMode() {
   if (mode == 0) {
     println("Mode is 0 (demo mode)");
   }
@@ -11,7 +11,10 @@ void printMode() {
 }
 
 void demoMode() {
-  _strutNoise
+  // TODO somthing in demo mode is missing, it behaves different than live
+  _strutNoise += 0.03;
+  _xNoise += 0.03;
+  _yNoise += 0.003;
   
   _strutFactor = (noise(_strutNoise) * _strutMax) + _strutMin; // play with this
   _rad = (noise(_xNoise) * _radMax) + _radMin; //map(mouseX, 0, width, _radMin, _radMax)

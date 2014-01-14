@@ -79,7 +79,7 @@ void setup() {
   if (frame != null) {
     frame.setResizable(true);
   }
-  
+
   _strutNoise = random(10);
   _xNoise = random(10);
   _yNoise = random(10);
@@ -94,7 +94,7 @@ void setup() {
   freq = new Frequency(minim, in, track, fft, sampleRate, 
   bufferSize, fft_base_freq, fft_band_per_oct, numZones );
   freq.initialize();
-  
+
   // make background black;
   background(0);
 }
@@ -106,9 +106,7 @@ void draw() {
   background(0, 20);
 
   // increase noise
-  _strutNoise += 0.01;
-  _xNoise += 0.01;
-  _yNoise += 0.001;
+
 
   // pick mode
   if (mode == 0) { 
@@ -132,10 +130,6 @@ void draw() {
   shape1 = new FractalRoot(90+frameCount, _degCount, _rad, cx, cy, _r, _g, _b, _alph, _recursion); //use frameCount to spin
   shape1.drawShape();
 
-  _strutNoise += 0.02; // TODO why increased again?
-  _xNoise += 0.02;
-  _yNoise += 0.002;
-
   shape3 = new FractalRoot(270+frameCount, _degCount+180, _rad/_numSides, cx, cy, _r, _g, _b, _alph-50, 2);
   shape3.drawShape();
 }
@@ -145,3 +139,4 @@ void stop() {
   track.close();
   minim.stop();
 }
+
