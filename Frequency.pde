@@ -61,8 +61,8 @@ class Frequency implements AudioListener
   }
 
   void initialize() {
-    /* TODO why is this now in main?
-    minim = new Minim(this);
+    /* 
+    minim = new Minim(this); // TODO why is this now in main?
      track = minim.loadFile("track.mp3", bufferSize);
      track.loop();
      */
