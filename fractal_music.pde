@@ -105,9 +105,6 @@ void draw() {
   // draw slightly translucent black background
   background(0, 20);
 
-  // increase noise
-
-
   // pick mode
   if (mode == 0) { 
     demoMode();
@@ -122,7 +119,6 @@ void draw() {
 
   shape1 = new FractalRoot(90+frameCount, _degCount, _rad, cx, cy, _r, _g, _b, _alph, _recursion); //use frameCount to spin
   shape1.drawShape();
-
   shape3 = new FractalRoot(270+frameCount, _degCount+180, _rad/_numSides, cx, cy, _r, _g, _b, _alph-50, 2);
   shape3.drawShape();
 }
