@@ -3,22 +3,7 @@ fractal_music
 
 Responsive Music Visualization using 2D Fractal Structures
 
-August 4th 2013
-
-!!!!! ALPHA CODE !!!!! PLEASE READ !!!!! USAGE BELOW !!!!!
-
-This code isn't meant for general release, but it works!
-I intend to significantly improve, streamline and extend
-it in the coming weeks. Replace "track.mix" below to
-enable live music input! Allow the visualization to
-run for a few minutes to adapt the amplitude range
-to your selected track/type of music.
-
-If you manage to upload a high-quality screencast and send
-me the link before I manage to do so, I'd be very happy.
-
-Feel free to contact me for any feedback and inquiries.
-
+This is a work in progress - feel free to contact me for any feedback and inquiries.
 
 Enjoy!
 
@@ -29,7 +14,7 @@ contact@kemenczy.at
 www.kemenczy.at
 
 
-+++++USAGE+++++
+== Usage
 
 
 Press "m" to cycle between 1) demo 2) music analysis and 3) manual user input mode.
@@ -54,7 +39,7 @@ Press/hold "t" to decrease the number of sides / change the fractal shape.
 Left-click drag the mouse in order to change the strut factor along the X (width) axis.
 
 
-*****Sources/Inspirations*****
+== Sources/Inspirations
 
 
 Processing Reference and Tutorials
