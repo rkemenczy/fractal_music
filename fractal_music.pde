@@ -11,6 +11,7 @@ import ddf.minim.analysis.*;
 boolean fullScreen = false;
 int _maxlevels = 3; // maximum recursion level (up to 3 performant)
 int _numMax = 6; // max sides to fractal (up to 6 performant)
+color backg = #666666;
 
 // variables
 Minim minim;
@@ -61,7 +62,12 @@ FractalRoot shape2;
 FractalRoot shape3;
 
 void setup() {
-  size(displayWidth/2, displayHeight/2, OPENGL);
+  if (fullScreen) {
+    size(displayWidth, displayHeight, OPENGL);
+  }
+  else {
+    size(displayWidth/2, displayHeight/2, OPENGL);
+  }
   smooth();
   frameRate(30);
   if (frame != null) {
@@ -75,7 +81,7 @@ void setup() {
 
   // init minim 
   minim = new Minim(this);
-  track = minim.loadFile("track.mp3", bufferSize);
+  track = minim.loadFile("endofday.mp3", bufferSize);
   track.loop();
   in = minim.getLineIn(Minim.STEREO, bufferSize);
 
@@ -85,12 +91,12 @@ void setup() {
   freq.initialize();
 
   // make background black;
-  background(0);
+  background(backg);
 }
 
 void draw() {
   // draw slightly translucent black background
-  background(0, 20);
+  background(backg, 20);
 
   // pick mode
   if (mode == 0) { 

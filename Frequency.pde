@@ -61,11 +61,6 @@ class Frequency implements AudioListener
   }
 
   void initialize() {
-    /* 
-    minim = new Minim(this); // TODO why is this now in main?
-     track = minim.loadFile("track.mp3", bufferSize);
-     track.loop();
-     */
     fft = new FFT(bufferSize, sampleRate);    
     fft.logAverages(fft_base_freq, fft_band_per_oct);
 
@@ -146,14 +141,13 @@ class Frequency implements AudioListener
         freqArr[i] = norm;
 
         /* TODO was this a safeguard?
-       if (avg != freqArrLast[i]) {
+         if (avg != freqArrLast[i]) {
          freqArrLast[i] = avg;
          }
          */
       }
     }
 
-    //store(freqArr); // TODO what?
     return freqArr;
   }
 }
