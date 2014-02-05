@@ -1,17 +1,19 @@
 /* 
  in a nutshell:
- * dragging the mouse in X changes the strutFactor
- * dragging the mouse in Y changes rad
+ * dragging the mouse in X changes the strutFactor for mode 2
+ * dragging the mouse in Y changes rad for mode 2
  * m changes mode
  * l sets input to line-in
  * g clears the FreqArray
- * k clears screen with white background
- * i applies inversion filter
- * o applies dilation
+ * k clears screen with white background BAD!
+ * i applies inversion filter SLOW!
+ * o applies dilation SLOW!
  * w increase rad
  * e decrease rad 
  * r increase number of sides
  * t decrease number of sides
+ * z increases max sides
+ * u decreases max sides
  */
 
 void mouseDragged() {
@@ -44,6 +46,8 @@ void keyPressed() {
   case 'G': 
     for (int i = 0; i < numZones; i++) {
       freq.maxArr[i] = 0;
+      freq.freqArr[i] = 0;
+      freq.freqArrLast[i] = 0;
     }
     println("cleared freq array");
     break;
@@ -62,19 +66,21 @@ void keyPressed() {
     break;
   case 'w':
   case 'W':
-    _rad += 10;
-    println("rad is: "+_rad);
+    _radMin += 10;
+    _radMax += 10;
+    println("rad is between "+_radMin+" and "+_radMax);
     break;
   case 'e':
   case 'E': 
-    _rad -= 10;
-    println("rad is: "+_rad);
+    _radMin -= 10;
+    _radMax -= 10;
+    println("rad is between "+_radMin+" and "+_radMax);
     break;
   case 'r':
   case 'R': 
     if (_numSides <= _numMax) { 
       _numSides += 1;
-      checkSides();
+      //checkSides();
     }
     println("Sides: "+_numSides);
     break;
@@ -85,6 +91,19 @@ void keyPressed() {
       checkSides();
     }
     println("Sides: "+_numSides);
+    break;
+
+  case 'y':
+  case 'Y':  
+    _numMax += 1;
+    println("max Sides: "+_numMax);
+    break;
+  case 'u':
+  case 'U': 
+    if (_numMax > 4) { 
+      _numMax -= 1;
+    }
+    println("max Sides: "+_numMax);
     break;
   }
 }

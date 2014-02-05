@@ -33,7 +33,7 @@ void demoMode() {
   _b = round(255*(noise(_strutNoise)));
   _alph = 100;
 
-  _rad = 150;
+  _rad = 150; // TODO overwrites 16 lines earlier?
   _radMin = 150;
   _radMax = 500;
   _recursion = 3;

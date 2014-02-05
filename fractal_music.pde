@@ -95,7 +95,7 @@ void setup() {
 }
 
 void draw() {
-  // draw slightly translucent black background
+  // draw slightly translucent background
   background(backg, 20);
 
   // pick mode
