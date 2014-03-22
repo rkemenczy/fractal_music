@@ -11,7 +11,7 @@ import ddf.minim.analysis.*;
 boolean fullScreen = false;
 int _maxlevels = 3; // maximum recursion level (up to 3 performant)
 int _numMax = 6; // max sides to fractal (up to 6 performant)
-color backg = #666666;
+int backgInt = 5;
 
 // variables
 Minim minim;
@@ -91,12 +91,12 @@ void setup() {
   freq.initialize();
 
   // make background black;
-  background(backg);
+  background(color(backgInt));
 }
 
 void draw() {
   // draw slightly translucent background
-  background(backg, 20);
+  background(color(backgInt, 20));
 
   // pick mode
   if (mode == 0) { 

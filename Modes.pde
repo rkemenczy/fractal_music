@@ -80,9 +80,9 @@ void musicAnalysisMode() {
   // 0 ***** 0 Hz - 86 Hz ***** //
   // colour? 
   int i = 0;
-  _b = round(drawFreqArr[i] * 255);
-  if (_b < 50) {
-    _b = 50;
+  _b = round(drawFreqArr[i] * 128 + 127);
+  if (_b < 150) {
+    _b = 150;
   }
 
   // 1 ***** 86 Hz - 172 Hz ***** //
@@ -119,9 +119,9 @@ void musicAnalysisMode() {
 
   // 4 ***** 689 Hz - 1378 Hz ***** //
   i = 4;
-  _g = round(drawFreqArr[i] * 255) - 50;
-  if (_g < 30) {
-    _g = 0;
+  _g = round(drawFreqArr[i] * 128) + 127;
+  if (_g < 100) {
+    _g = 100;
   }
 
   // 5 ***** 1378 Hz - 2756 Hz ***** // XXX snare? 
@@ -148,9 +148,9 @@ void musicAnalysisMode() {
 
   // 8 ***** 11025 Hz - 22050 Hz ***** // XXX highest pitch +++++
   i = 8;
-  _r = round(drawFreqArr[i] * 255) - 25;
-  if (_r < 25) {
-    _r = 0;
+  _r = round(drawFreqArr[i] * 128) + 127;
+  if (_r < 100) {
+    _r = 100;
   }
 }
 

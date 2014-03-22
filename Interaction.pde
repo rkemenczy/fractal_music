@@ -14,6 +14,7 @@
  * t decrease number of sides
  * z increases max sides
  * u decreases max sides
+ * up/down adjusts the backgroundcolour
  */
 
 void mouseDragged() {
@@ -104,6 +105,21 @@ void keyPressed() {
       _numMax -= 1;
     }
     println("max Sides: "+_numMax);
+    break;
+  }
+
+  switch(keyCode) {
+  case UP:
+    if (backgInt < 250) {
+      backgInt += 5;
+    }
+    println("backg is "+backgInt);
+    break;
+  case DOWN:
+    if (backgInt > 5) {
+      backgInt -= 5;
+    }
+    println("backg is "+backgInt);
     break;
   }
 }
